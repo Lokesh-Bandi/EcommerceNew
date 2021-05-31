@@ -49,6 +49,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   var _formKey = GlobalKey<FormState>();
 
+  //InputDecoration
+
   void initState() {
     super.initState();
     logoController = AnimationController(
@@ -83,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Future<bool> loginUser(String phone, BuildContext context) async {
 
+      List<String> currentIDs;
     _auth.verifyPhoneNumber(
         phoneNumber: phone,
         timeout: Duration(seconds: 60),
@@ -151,6 +154,32 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             photoURL: Constants.imageUrl
                           );
                           user.updateEmail(emailEditor.text);
+
+                          var allAddresses= StreamBuilder<QuerySnapshot>(
+                              stream: _firestore.collection('Users').snapshots(),
+                              builder: (context, snapshot) {
+
+                                if (snapshot.hasData) {
+                                  final displayData = snapshot.data.docs;
+                                  for (var eachProduct in displayData) {
+                                      currentIDs.add(eachProduct.id);
+                                  }
+                                  if (!currentIDs.contains(user.phoneNumber)){
+                                    _firestore.collection('Users').doc(user.phoneNumber).set({
+                                      'Active':'true',
+                                      'Addresses':[],
+                                      'Orders':[],
+                                      'Bag':[]
+                                    });
+                                  }
+                                }
+                                return Text('');
+                              }
+                          ) ;
+
+
+
+
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) {
                                 return HomePage();
@@ -264,28 +293,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.perm_contact_cal),
-                            counterText: "",
-                            labelText: 'Full name',
-                            hintText: 'Enter the name',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            contentPadding:
-                            EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Color(0xfffca9e4), width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Colors.lightBlueAccent, width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                          ),
+                          decoration: buildInputDecoration('Full name','Enter the name',Icons.perm_contact_cal),
                         ),
                       ),
                     ),
@@ -317,32 +325,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.email_sharp),
-                            labelText: 'Email',
-                            hintText: 'Enter the email',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            contentPadding:
-                            EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Color(0xfffca9e4), width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Colors.lightBlueAccent, width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                          ),
+                          decoration: buildInputDecoration('Email','Enter the email',Icons.email)
                         ),
                       ),
                     ),
                     //DisplayImage
                     buildImageUploadWidget(),
+
+
                     //Phone number
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -373,28 +363,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           onChanged: (value) {
                             phoneNumber = '+91'+value;
                           },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.phone),
-                            prefix: Text('+91'),
-                            labelText: 'Mobile number',
-                            hintText: 'Enter the mobile number',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            contentPadding:
-                            EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Color(0xfffca9e4), width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                              BorderSide(color: Colors.lightBlueAccent, width: 2.0),
-                              borderRadius: BorderRadius.all(Radius.circular(32.0)),
-                            ),
-                          ),
+                          decoration:buildInputDecoration('Mobile number','Enter the mobile number',Icons.phone)
                         ),
                       ),
                     ),
@@ -439,6 +408,32 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
       ),
     );
+  }
+
+  //InputDecoration for textFields
+  InputDecoration buildInputDecoration(String labelText,String hintText,IconData icon) {
+    return InputDecoration(
+                          prefixIcon: Icon(icon),
+                          counterText: "",
+                          labelText:labelText ,
+                          hintText: hintText,
+                          hintStyle: TextStyle(color: Colors.grey),
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                            BorderSide(color: Color(0xfffca9e4), width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                            BorderSide(color: Colors.lightBlueAccent, width: 2.0),
+                            borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                          ),
+                        );
   }
 
   void _submit() {

@@ -5,12 +5,16 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_commerce/PhotoScreen/ImageViewer.dart';
 import 'package:e_commerce/Payment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:getwidget/colors/gf_color.dart';
+import 'package:getwidget/components/button/gf_button.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:badges/badges.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'DetailsTable.dart';
+import 'package:getwidget/getwidget.dart';
+
 
 
 class ProductDetails extends StatefulWidget {
@@ -54,14 +58,14 @@ class _ProductDetailsState extends State<ProductDetails> {
         child: ListView(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 20,horizontal: 20),
+              padding: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
               child: Container(
                 margin: EdgeInsets.all(5),
                 child: Badge(
                   elevation: 7,
                   toAnimate: false,
                   shape: BadgeShape.square,
-                  badgeColor: Colors.black,
+                  badgeColor: GFColors.INFO,
                   borderRadius: BorderRadius.circular(16),
                   badgeContent: Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -81,7 +85,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             ),
             //carousel slider
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+              padding: EdgeInsets.symmetric(vertical: 5,horizontal: 5),
               child: StreamBuilder<QuerySnapshot>(
               stream: _firestore.collection('productDetails').snapshots(),
               builder: (context,snapshot){
@@ -323,26 +327,28 @@ class _ProductDetailsState extends State<ProductDetails> {
               child: DetailsTable(productId:productId,productName:productName),
             ),
             //button
+            
+            // Place order button
             Container(
-              margin: EdgeInsets.all(15),
-              height:100,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: RaisedButton(
-                    onPressed:(){
-                      Navigator.push(context,MaterialPageRoute(builder: (_){
-                        return PaymentScreen(productId: productId,productName: productName,price: price,);
-                      }));
-                    },
-                    color: Colors.lightBlue[900],
-                    child:Text("Place Order",
-                      style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.yellowAccent
-                      ),)),
-              ),
-            ),
+              height: 60,
+              margin: EdgeInsets.only(top: 8,bottom:6,left: 15,right: 15),
+              child: GFButton(
+                  onPressed:(){
+                    Navigator.push(context,MaterialPageRoute(builder: (_){
+                      return PaymentScreen(productId: productId,productName: productName,price: price,);
+                    }));
+                  },
+                  shape: GFButtonShape.pills,
+                  fullWidthButton: true,
+                  size: GFSize.LARGE,
+                  color: GFColors.INFO,
+                  child:Text("Make Payment",
+                    style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: GFColors.WHITE
+                    ),)),
+            )
           ],
         ),
       ),

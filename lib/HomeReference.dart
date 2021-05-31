@@ -1,3 +1,4 @@
+import 'package:e_commerce/AddressForm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:e_commerce/LoginScreen.dart';
@@ -12,7 +13,9 @@ import 'package:badges/badges.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:e_commerce/Addresses.dart';
+
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomeReference extends StatefulWidget {
   @override
@@ -75,14 +78,20 @@ class _HomeReferenceState extends State<HomeReference> {
   var carouselOffer = 4000;
   var screenLoading;
 
+  var address;
+  var addresses;
+
+
   void initState() {
     super.initState();
+    
     sareeList = [];
 
     setState(() {
       isLoading = true;
     });
-
+    
+    //ScreenLoading
     screenLoading = true;
     Future.delayed(Duration( milliseconds: 1400),(){
       setState(() {
@@ -90,8 +99,11 @@ class _HomeReferenceState extends State<HomeReference> {
       });
     });
 
+
+
     getSareeTypes();
     getPosition();
+
   }
 
   //getting data from firebase
@@ -120,6 +132,8 @@ class _HomeReferenceState extends State<HomeReference> {
 
   Widget build(BuildContext context) {
     final _mediaQuery = MediaQuery.of(context).size;
+    var address=Addresses(context: context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: Drawer(
@@ -277,6 +291,46 @@ class _HomeReferenceState extends State<HomeReference> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
+          IconButton(
+            onPressed: (){
+              showModalBottomSheet(
+                  context: context,
+                  builder: (context){
+                    return Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Container(
+                        child:ListView(
+                          children:[
+                            ListTile(
+                              leading:Icon(CupertinoIcons.home),
+                              title:Text('Select Your Address'),
+                              subtitle: Text('Delivery Address'),
+                              trailing: GestureDetector(
+                                  onTap: (){
+                                    showDialog(context: context, builder:(BuildContext context){
+                                      return AddressForm();
+                                    });
+                                  },
+                                  child: Icon(CupertinoIcons.add,size: 30,color: Colors.black,
+                                  )
+                              ),
+                            ),
+                            Divider(
+                              thickness: 2,
+                            ),
+                            // Address()
+                        address.getAddresses()
+
+                          ]
+
+                        )
+                      ),
+                    );
+                  });
+            },
+            tooltip:'Your Address',
+            icon:Icon(CupertinoIcons.home)
+          ),
           IconButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) {

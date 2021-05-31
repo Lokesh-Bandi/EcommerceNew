@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:e_commerce/HomeReferenceUpdate/EditableHomeReference.dart';
 import 'package:e_commerce/LoginScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:e_commerce/InsertDeleteHomePage.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/painting.dart';
 import 'package:e_commerce/HomeReference.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
-import 'package:lottie/lottie.dart';
 
 bool alreadyVisited=false;
 
@@ -48,6 +46,7 @@ Future<void> main() async {
 }
 
 class CheckInternet {
+  // ignore: cancel_subscriptions
   StreamSubscription<DataConnectionStatus> listener;
   var internetStatus ;
   var contentMessage ;

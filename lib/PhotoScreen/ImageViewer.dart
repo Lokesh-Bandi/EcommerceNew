@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
+// ignore: must_be_immutable
 class HeroAnimation1 extends StatelessWidget {
   @override
-  String url = "";
-  HeroAnimation1({this.url});
+  var url;
+  var index;
+  HeroAnimation1({this.url,this.index});
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +15,10 @@ class HeroAnimation1 extends StatelessWidget {
           Navigator.pop(context);
         },
         child: Center(
-          child: PhotoView(imageProvider: NetworkImage(url)),
+          child: PhotoView(
+            imageProvider: NetworkImage(url),
+            // heroAttributes: PhotoViewHeroAttributes(tag: url+index.toString()),
+          ),
         ),
       ),
     );

@@ -3,26 +3,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:getwidget/getwidget.dart';
 
-final _firestore = FirebaseFirestore.instance;
-final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-var firebaseAddresses=[];
-List<AddressWidget> addresses=[];
 
 
 class Addresses{
 
+  final _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  var firebaseAddresses=[];
+  List<AddressWidget> addresses=[];
+  var addressesFromFirebase;
 
   var context;
   Addresses({this.context});
 
 
-  //List of Addresses from firebase
+  void getAddressesFromFirebase() async{
 
-  Widget getAddresses() {
-
-    var allAddresses=StreamBuilder<QuerySnapshot>(
+    addressesFromFirebase=StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('Users').snapshots(),
         builder: (context, snapshot) {
 
@@ -37,7 +35,7 @@ class Addresses{
               }
             }
             for(var i=0;i<firebaseAddresses.length;i++) {
-              addresses.add(AddressWidget(firebaseAddress: firebaseAddresses[i].toString().split(",")));
+              addresses.add(AddressWidget(firebaseAddresses:firebaseAddresses,firebaseAddress: firebaseAddresses[i].toString().split(",")));
             }
           }
           return Column(
@@ -45,19 +43,30 @@ class Addresses{
           );
         }
     ) ;
-    return allAddresses ;
   }
+
+  //List of Addresses from firebase
+  Widget getAddresses() {
+    getAddressesFromFirebase();
+    return addressesFromFirebase ;
+  }
+
 }
 
 
 //Widget of AddressTile
+// ignore: must_be_immutable
 class AddressWidget extends StatelessWidget {
-  const AddressWidget({
+  AddressWidget({
     Key key,
     @required this.firebaseAddress,
+    this.firebaseAddresses
   }) : super(key: key);
 
   final List firebaseAddress;
+  final _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  List firebaseAddresses;
 
   @override
   Widget build(BuildContext context) {
@@ -86,10 +95,14 @@ class AddressWidget extends StatelessWidget {
           title: Text(firebaseAddress[0]+", "+firebaseAddress[1]),
           subtitle: Text(firebaseAddress[2]+', '+firebaseAddress[3]+", "+firebaseAddress[4]),
           trailing:InkWell(
-            onTap: (){
+            onTap: () async{
+              firebaseAddresses.remove(this.firebaseAddress[0]+','+this.firebaseAddress[1]+','+this.firebaseAddress[2]+','+this.firebaseAddress[3]+','+this.firebaseAddress[4]);
+              print(firebaseAddresses);
+              _firestore.collection('Users').doc(_firebaseAuth.currentUser.phoneNumber).update({
+                'Addresses':FieldValue.arrayUnion(firebaseAddresses)
+              });
 
-
-            },
+              },
               child: Icon(CupertinoIcons.clear_circled,size: 30,)
           )
         ),

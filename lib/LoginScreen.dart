@@ -151,33 +151,44 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           prefs.setBool('alreadyVisited', true);
                           user.updateProfile(
                             displayName: nameEditor.text,
-                            photoURL: Constants.imageUrl
+                            photoURL: (Constants.imageUrl==null)?"https://ibb.co/M2GdhSr":Constants.imageUrl
                           );
                           user.updateEmail(emailEditor.text);
 
-                          var allAddresses= StreamBuilder<QuerySnapshot>(
-                              stream: _firestore.collection('Users').snapshots(),
-                              builder: (context, snapshot) {
-
-                                if (snapshot.hasData) {
-                                  final displayData = snapshot.data.docs;
-                                  for (var eachProduct in displayData) {
-                                      currentIDs.add(eachProduct.id);
-                                  }
-                                  if (!currentIDs.contains(user.phoneNumber)){
-                                    _firestore.collection('Users').doc(user.phoneNumber).set({
-                                      'Active':'true',
-                                      'Addresses':[],
-                                      'Orders':[],
-                                      'Bag':[]
-                                    });
-                                  }
-                                }
-                                return Text('');
-                              }
-                          ) ;
-
-
+                          // var allAddresses= StreamBuilder<QuerySnapshot>(
+                          //     stream: _firestore.collection('Users').snapshots(),
+                          //     builder: (context, snapshot) {
+                          //
+                          //       if (snapshot.hasData) {
+                          //         print("firstIF");
+                          //         final displayData = snapshot.data.docs;
+                          //         for (var eachProduct in displayData) {
+                          //             currentIDs.add(eachProduct.id);
+                          //             print(eachProduct.id);
+                          //         }
+                          //         if (currentIDs.contains(user.phoneNumber)){
+                          //           print("2if");
+                          //           _firestore.collection('Users').doc(
+                          //               user.phoneNumber).update({
+                          //             'Active': 'true'
+                          //           });
+                          //         }
+                          //         else {
+                          //           print('else');
+                          //
+                          //         }
+                          //       }
+                          //
+                          //       return Text('');
+                          //     }
+                          // ) ;
+                          Constants.imageEmpty= Constants.imageStatusFail;
+                          _firestore.collection('Users').doc(user.phoneNumber).set({
+                            'Active':'true',
+                            'Addresses':[],
+                            'Orders':[],
+                            'Bag':[]
+                          });
 
 
                           Navigator.push(context,

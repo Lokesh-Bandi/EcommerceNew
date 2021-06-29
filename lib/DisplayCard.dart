@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:e_commerce/ProductDetails.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_commerce/MyBag.dart';
+import 'package:getwidget/colors/gf_color.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:geocoding/geocoding.dart';
+
+
 // ignore: must_be_immutable
 class DisplayCard extends StatefulWidget {
   String productId;
@@ -13,6 +17,7 @@ class DisplayCard extends StatefulWidget {
   double offer;
   double oldPrice;
   String imageUrl;
+  var geoPoint;
   List<String> reviews;
 
 
@@ -25,7 +30,8 @@ class DisplayCard extends StatefulWidget {
         this.offer,
         this.oldPrice,
         this.imageUrl,
-        this.reviews})
+        this.reviews,
+      this.geoPoint})
       : super(key: key);
 
   @override
@@ -35,24 +41,18 @@ class DisplayCard extends StatefulWidget {
 class _DisplayCardState extends State<DisplayCard> {
   var unsaved=Icon(CupertinoIcons.heart);
 
-  var saved=Icon(CupertinoIcons.heart_fill);
+  var saved=Icon(CupertinoIcons.heart_fill,color: GFColors.WARNING);
 
   var isSaved=false;
+  List<Placemark> placeMarks=[];
 
-  String ratingFunction(int rating) {
-    String full = "★";
-    String empty = "☆";
-    String result = "";
-    int i;
-    for (i = 1; i <= rating; i++) {
-      result = result + full;
-    }
-    if (i <=5) {
-      for (i = rating + 1; i <= 5; i++) {
-        result = result + empty;
-      }
-    }
-    return result;
+  initState(){
+    super.initState();
+    getAddress();
+  }
+
+  getAddress() async{
+    placeMarks = await placemarkFromCoordinates(this.widget.geoPoint.latitude, this.widget.geoPoint.longitude);
   }
 
   @override
@@ -69,14 +69,15 @@ class _DisplayCardState extends State<DisplayCard> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           ),
-          shadowColor: Colors.yellowAccent,
-          elevation: 9,
+          shadowColor: Colors.grey,
+          elevation: 4,
           child: Container(
-            padding: EdgeInsets.fromLTRB(3, 5, 3, 5),
-            height: 320,
+            padding: EdgeInsets.fromLTRB(3, 5, 3, 0),
+            height: 220,
             width: double.maxFinite,
             child: Column(
               children: [
+                //Product name
                 Expanded(
                   flex: 2,
                   child: Padding(
@@ -86,27 +87,33 @@ class _DisplayCardState extends State<DisplayCard> {
                         Text(
                           widget.productName,
                           style: TextStyle(
-                              fontSize: 17, fontWeight: FontWeight.bold,fontFamily: 'YuseiMagic'),
+                              fontSize: 15, fontWeight: FontWeight.bold,fontFamily: 'YuseiMagic'),
                         ),
                       ]),
                     ),
                   ),
                 ),
+
+                //Image and Details
                 Expanded(
-                  flex: 7,
+                  flex: 6,
                   child: Row(
                     children: [
+                      //Image
                       Expanded(
-                        flex: 3,
+                        flex: 2,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 12),
                           child: Container(
-                            child: Column(children: [
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
                               Expanded(
                                 child: CachedNetworkImage(
                                   imageUrl: widget.imageUrl,
                                   imageBuilder: (context, imageProvider) => Container(
                                     decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
                                       image: DecorationImage(
                                           image: imageProvider,
                                           fit: BoxFit.fill,
@@ -114,7 +121,7 @@ class _DisplayCardState extends State<DisplayCard> {
                                   ),
                                   ),
                                   placeholder: (context, url) => Center(
-                                      child: LoadingBouncingGrid.circle(
+                                      child: LoadingJumpingLine.circle(
                                         size: 30,
                                         backgroundColor: Color(0xfffca9e4),
                                     )
@@ -126,29 +133,43 @@ class _DisplayCardState extends State<DisplayCard> {
                           ),
                         ),
                       ),
+
+                      //Details
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Container(
                           width: double.maxFinite,
                           child: Column(
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "By "+widget.offeredBy,
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black,fontFamily: 'EBGaramond'),
+                                child: Center(
+                                  child: Text(
+                                    "By "+widget.offeredBy,
+                                    style: TextStyle(
+                                        fontSize: 13, color: Colors.black,fontFamily: 'EBGaramond'),
+                                  ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "₹${widget.price}",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    "₹${widget.price}",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "₹${widget.oldPrice}",
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        decoration: TextDecoration.lineThrough,
+                                        color: Colors.redAccent,
+                                        fontWeight: FontWeight.w300),
+                                  )
+                                ],
                               ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical:5.0,horizontal: 1),
@@ -162,23 +183,9 @@ class _DisplayCardState extends State<DisplayCard> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical:5.0,horizontal: 1),
+                                padding: const EdgeInsets.symmetric(horizontal:8.0,vertical: 4),
                                 child: Text(
-                                  "₹${widget.oldPrice}",
-                                  style: TextStyle(
-                                      fontSize: 13,
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.redAccent,
-                                      fontWeight: FontWeight.w300),
-                                ),
-                              ),
-                              // SizedBox(
-                              //   height: 28
-                              // ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "View >>",
+                                  "view >>",
                                   style: TextStyle(
                                     fontFamily: 'EBGaramond',
                                       letterSpacing: 3,

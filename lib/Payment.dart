@@ -97,7 +97,36 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment Details'),
+        backgroundColor: Theme
+            .of(context)
+            .primaryColor,
+        title: Text("Payment Details",
+          style: TextStyle(
+              color: Colors.white
+          ),
+        ),
+        actions: [
+          IconButton(
+              icon: Icon(
+                Icons.filter_alt_sharp,
+                color: Colors.white,
+              ),
+              onPressed: (){
+
+              }),
+          Padding(
+            padding: const EdgeInsets.only(right:8.0),
+            child: IconButton(
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
+                ),
+                onPressed: (){
+
+                }),
+          )
+
+        ],
       ),
       body: ListView(
         children: [

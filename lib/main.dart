@@ -41,7 +41,7 @@ Future<void> main() async {
         secondaryHeaderColor: Colors.blue,
           primaryColor: Color(0xfffca9e4)
       ),
-      home: SafeArea(child: (alreadyVisited!=null)?(HomePage()):(LoginScreen())))
+      home: SafeArea(child: (alreadyVisited!=null)?(HomeReference()):(LoginScreen())))
   );
 }
 

@@ -97,7 +97,6 @@ class AddressWidget extends StatelessWidget {
           trailing:InkWell(
             onTap: () async{
               firebaseAddresses.remove(this.firebaseAddress[0]+','+this.firebaseAddress[1]+','+this.firebaseAddress[2]+','+this.firebaseAddress[3]+','+this.firebaseAddress[4]);
-              print(firebaseAddresses);
               _firestore.collection('Users').doc(_firebaseAuth.currentUser.phoneNumber).update({
                 'Addresses':FieldValue.arrayUnion(firebaseAddresses)
               });

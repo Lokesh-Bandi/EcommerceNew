@@ -54,7 +54,7 @@ dependencies:
   fluttertoast: ^8.0.7
   shimmer: ^2.0.0
   geocoding: ^2.0.0
-  group_radio_button: ^1.1.0
+
 
 dev_dependencies:
   flutter_test:

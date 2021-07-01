@@ -1,3 +1,4 @@
+import 'package:e_commerce/HomeReference.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_commerce/main.dart';
@@ -193,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
                           Navigator.push(context,
                               MaterialPageRoute(builder: (_) {
-                                return HomePage();
+                                return HomeReference();
                               }));
                         } else {
                           print("Error");
@@ -246,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         Expanded(
                           flex: 8,
                           child: Text(
-                            'Your Best',
+                            'Regional Choice',
                             style: TextStyle(
                               color: Color(0xfffca9e4),
                                 fontSize: 35.0,

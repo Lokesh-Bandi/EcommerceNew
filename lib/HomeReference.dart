@@ -14,7 +14,8 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:e_commerce/Addresses.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:e_commerce/MyBag.dart';
+
 
 class HomeReference extends StatefulWidget {
   @override
@@ -81,6 +82,7 @@ class _HomeReferenceState extends State<HomeReference> {
 
   var address;
   var addresses;
+  var topCarouselItems;
 
   final globalKey = GlobalKey<ScaffoldState>();
 
@@ -88,6 +90,7 @@ class _HomeReferenceState extends State<HomeReference> {
     super.initState();
 
     sareeList = [];
+    topCarouselItems=[];
 
     setState(() {
       isLoading = true;
@@ -106,8 +109,25 @@ class _HomeReferenceState extends State<HomeReference> {
 
     getSareeTypes();
     getPosition();
+    getTopCarousel();
   }
 
+  void getTopCarousel() async {
+
+
+      await FirebaseFirestore.instance
+        .collection('TopOffers')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        topCarouselItems.add([doc["Offer"],doc["Desc"],doc["Type"],doc["Price"]]);
+      });
+    });
+
+    setState(() {
+
+    });
+  }
   //getting data from firebase
   void getSareeTypes() async {
     await for (var snapshot
@@ -212,7 +232,10 @@ class _HomeReferenceState extends State<HomeReference> {
               ),
               title: Text('My Bag'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyBag()),
+                );
               },
             ),
             ListTile(
@@ -320,7 +343,7 @@ class _HomeReferenceState extends State<HomeReference> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 25.0),
+                  padding: const EdgeInsets.only(top: 15.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -657,8 +680,8 @@ class _HomeReferenceState extends State<HomeReference> {
 
             //Top carousel
             GFCarousel(
-              items: bgColors.map(
-                (color) {
+              items: topCarouselItems.map<Widget>(
+                (item) {
                   return Container(
                     padding: EdgeInsets.only(bottom: 12.0, top: 8.0),
                     margin: EdgeInsets.only(
@@ -668,7 +691,7 @@ class _HomeReferenceState extends State<HomeReference> {
                         child: Stack(
                           children: [
                             Container(
-                              color: color,
+                              color:bgColors[topCarouselItems.indexOf(item)%5] ,
                             ),
                             Positioned(
                               left: 20,
@@ -676,7 +699,7 @@ class _HomeReferenceState extends State<HomeReference> {
                               child: AnimatedTextKit(
                                 animatedTexts: [
                                   ColorizeAnimatedText(
-                                    'Cashback',
+                                    item[0].toString()??"",
                                     textStyle: colorizeTextStyle,
                                     colors: colorizeColors,
                                   ),
@@ -697,8 +720,7 @@ class _HomeReferenceState extends State<HomeReference> {
                                     color: Colors.black87),
                                 child: AnimatedTextKit(
                                   animatedTexts: [
-                                    TyperAnimatedText(
-                                        'Hurry up..!!! Cashback.... on purchase of Fancy Wear and Georgette Sarees'),
+                                    TyperAnimatedText(item[1].toString()??"")
                                   ],
                                   isRepeatingAnimation: false,
                                 ),
@@ -716,7 +738,7 @@ class _HomeReferenceState extends State<HomeReference> {
                                     color: Colors.black87),
                                 child: AnimatedTextKit(
                                   animatedTexts: [
-                                    TyperAnimatedText('Upto ₹ $carouselOffer *'),
+                                    TyperAnimatedText((item[2].toString()??"" )+  " ₹ " +item[3].toString()??""+ " *"),
                                   ],
                                   isRepeatingAnimation: false,
                                 ),

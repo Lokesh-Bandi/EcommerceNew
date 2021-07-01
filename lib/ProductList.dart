@@ -288,16 +288,18 @@ class _ProductListState extends State<ProductList> {
                           padding: EdgeInsets.only(left: 20),
                           scrollDirection: Axis.horizontal,
                           children: [
-                            Text('Products Available :',
+                            Text('Products ▼ Available in Radius of ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.black54)
+                            ),
+                            Text(' $distanceRange Kms',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: Colors.black54)),
-                            Text((productsCount==null?"...":productsCount.toString())+"  "+"(Radius : $distanceRange Kms)" ?? 'Loading...',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black54)),
+                                    color: Colors.black87))
+
                           ],
                         ),
                       )
